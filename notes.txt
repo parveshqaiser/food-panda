@@ -1,0 +1,201 @@
+
+// createElement takes 3 args . 
+// name of the tag, attribute , our text
+// react.CreateElement gives an object not tag name
+// suppose already some tag is here , then it will replace with the new tag that we have created and rendered index.html page
+
+
+// the empty object in the place is where we give attributes for the element
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+let uName = "Parvesh Qaiser";
+
+// let h1 = React.createElement("h1",{id : "one"},`Welcome to React JS, Mr ${uName}`);
+// the react element will create a javascript object
+// let root = ReactDOM.createRoot(document.getElementById("root"));
+
+// render will convert the object into the tag that we have asked for and put it into browser
+// root.render(h1);
+
+// to create
+
+{/* <div>
+    <p id="one"></p>
+    <p id="two"></p>
+</div> */}
+
+// for the above code , we usually write in an array
+
+Issues in this project.
+Login Page required.
+
+Cart Page Data Display and total bill amount
+
+let heading = <h1 className="hello">Welcome to React JS by Akshay Saini </h1>;
+let root = ReactDOM.createRoot(document.getElementById("root"));
+
+let TitleComponent = ()=>{
+    return <h4>From title component</h4>
+}
+
+let HeadingComponent =()=>{
+    return (
+        <>
+            <TitleComponent />
+            <h1>Hello , welcome to component </h1>
+        </>
+    )
+};
+
+// way to injecting react element into functional comp
+let HeadingComponent1 = ()=> (
+    <div>
+        {heading}
+        <h3>Hello Short Hand Component </h3>
+        <TitleComponent />
+        <TitleComponent></TitleComponent>
+        {TitleComponent()}
+    </div>
+    
+);
+
+root.render(<HeadingComponent1 />);
+
+
+**************************************************
+when you use redux store to store value, you should not store values like this , {id:"", function : ()=>{}, some other value},
+otherwise it will throw some error like serial num something
+
+in createSlice file , let userInfo = createSlice({
+    initialState : {
+        // dont forget to give this one
+    }
+});
+
+
+
+*********************************************************** Cart Item Component before adding sticky to it
+
+import { useDispatch , useSelector} from "react-redux";
+import { REST_IMAGE_URL } from "../utils/constants";
+import { clearCart , removeItem } from "../utils/cartSlice";
+import { ToastContainer, toast } from "react-toastify";
+// import {TrashIcon} from "@heroicons/react/outline/TrashIcon"
+import TrashIcon from "@heroicons/react/outline/TrashIcon";
+
+const CartItems = ()=>{
+
+    let cartList = useSelector(store => store.cart.items);
+
+    let dispatch = useDispatch();
+
+
+    function handleRemoveAll()
+    {
+        dispatch(clearCart());
+        toast.success("Your Cart Items has been Removed");
+    }
+
+    function handleRemoveItem(index,name)
+    {
+        dispatch(removeItem(index));
+        toast.success(name +" "+ "Removed");
+    }
+    
+    return(
+        <>
+         <ToastContainer  
+            position="top-right"
+            autoClose={2300}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            theme="light" 
+        />
+        <h2 className="mx-4 text-center text-xl">Welcome to Cart Items</h2>
+        <div className="text-end mr-4">
+            <button 
+                disabled={cartList.length ==0 ? true : false} 
+                className="cursor-pointer rounded-lg bg-red-300 p-1 m-1 disabled:cursor-not-allowed"
+                onClick={handleRemoveAll}
+            >
+                Remove All Cart Items
+            </button>
+        </div>
+
+        <div className=" m-4 p-2 w-6/12 mx-auto shadow-md bg-gray-100">
+        {
+            cartList.length ? cartList.map((item,index)=>(
+                <div className="text-left flex justify-between border-gray-200 border-b-4 p-2 m-2" key={item.card.info.id}>
+                    <div className="w-9/12">
+                        <span>{item.card.info.name} </span>
+                        <span>&nbsp;&#8377; {item.card.info.price/100 || item.card.info.defaultPrice/100}</span>
+                        <p className="text-sm">{item.card.info.description}</p>
+                    </div>
+                    <div className="w-3/12 px-2">
+                        <img className="" src={REST_IMAGE_URL+"/"+item?.card?.info?.imageId} /> 
+                        <div className="my-1">
+                            <TrashIcon onClick={()=>handleRemoveItem(index,item.card.info.name)} className="h-6 w-6 text-red-800 cursor-pointer outline outline-1"/>
+                        </div>             
+                    </div>
+                </div>
+            )) : <h2 className="text-center">Your Food Cart is empty.</h2>
+        }
+        </div>
+        </>
+    )
+}
+
+export default CartItems;
+
+// based on routed
+ let appRoutes = createBrowserRouter([
+        {
+             path:"/",
+             element : <AppLayout/>,
+             errorElement : <FileNotFound />,
+             children :[
+                 {
+                     path :"/",
+                     element : (<Suspense>
+                         <LoginPage />
+                     </Suspense>)
+                 },
+                 {
+                     path :"/home",
+                     element : (<Suspense>
+                         <Body />
+                     </Suspense>)
+                 },
+                 {
+                     path :"/about",
+                     element : (
+                         <Suspense fallback={<h2>Loading...</h2>}> 
+                             <About />
+                         </Suspense>
+                     )
+                 },
+                 {
+                     path :"/contact",
+                     element : <Contact />
+                 },
+                 {
+                     path :"/cart",
+                     element : <CartItems />
+                 },
+                 {
+                     path : "/rest/:id",
+                     element : (
+                         <Suspense fallback ={<h1>Loading....</h1>}>
+                             <RestaurantMenu />
+                         </Suspense>
+                     )
+                     
+                 }
+             ]
+        }
+    ]);
